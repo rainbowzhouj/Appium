@@ -30,7 +30,7 @@ class Testhuadong():
         print("点击手势密码锁")
         self.driver.find_element_by_accessibility_id("手势密码锁").click()
         self.driver.find_element_by_id("cn.kmob.screenfingermovelock:id/patternTxt").click()
-        time.sleep(3)
+        # time.sleep(3)
         print("滑动用例")
         action=TouchAction(self.driver)
         action.press(x=908,y=253).wait(200).move_to(x=551,y=262).wait(200).move_to(x=168,y=298).wait(200).move_to(x=170,y=646).release().perform()
