@@ -4,7 +4,7 @@ from appium import webdriver
 from appium.webdriver.common.mobileby import MobileBy
 
 
-class TestToast():
+class TestToast:
     def setup(self):
         desired_caps = {}
         desired_caps['platformName'] = 'Android'
