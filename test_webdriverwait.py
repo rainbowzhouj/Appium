@@ -26,8 +26,8 @@ class TestWebDriverwait:
         desired_caps['resetKeyBoard'] = 'true'
         # 跳过设备初始化
         desired_caps['skipDeviceInitialization'] = True
-        # 跳过元素等待
-        #desired_caps['settings[waitForIdleTimeout]'] = 0
+        # 等待空闲超时，设置该值为0，可以节省测试时间，默认的值为10000毫秒
+        #desired_caps['settings[waitForIdleTimeout]'] = 0 # 使用方式1
         self.driver = webdriver.Remote("http://127.0.0.1:4723/wd/hub", desired_caps)
         self.driver.implicitly_wait(5)
 
@@ -78,7 +78,8 @@ class TestWebDriverwait:
         # self.driver.find_element(MobileBy.ID,"com.android.permissioncontroller:id/permission_allow_foreground_only_button").click()
         # WebDriverWait(self.driver,10).until(lambda x: x.find_element(MobileBy.XPATH,"//*[contains(@text,'打卡')]"))
         # //*[contains(@text,'下班时间')]/../*[@text='更新打卡']
-        time.sleep(10)
+        #time.sleep(10)
+        self.driver.update_settings({"waitForIdleTimeout":0}) # 缩短加载元素时间，使用方式2
         aaa = WebDriverWait(self.driver, 10).until(
             lambda x: x.find_element(MobileBy.XPATH, "//*[contains(@text,'更新打卡')]"))
         aaa.click()
@@ -113,7 +114,7 @@ class TestWebDriverwait:
             self.driver.find_element(MobileBy.XPATH, "//*[@text='迟到打卡']").click()
         else:
             self.driver.find_element(MobileBy.XPATH, "//*[@text='迟到外勤']").click()
-        self.driver.find_element(MobileBy.ID, "com.larksuite.suite:id/confirm").click()
+        self.driver.find_element(MobileBy.ID, "com.larksuite.suite:id/confirm").click() #确认打卡
 
         #assert "外勤打卡" in self.driver.page_source
         # 显式等待 断言是否成功
