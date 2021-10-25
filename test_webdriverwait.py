@@ -3,6 +3,7 @@ import time
 import pytest
 from appium import webdriver
 from appium.webdriver.common.mobileby import MobileBy
+from appium.webdriver.common.touch_action import TouchAction
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
@@ -27,11 +28,12 @@ class TestWebDriverwait:
         # 跳过设备初始化
         desired_caps['skipDeviceInitialization'] = True
         # 等待空闲超时，设置该值为0，可以节省测试时间，默认的值为10000毫秒
-        #desired_caps['settings[waitForIdleTimeout]'] = 0 # 使用方式1
+        desired_caps['settings[waitForIdleTimeout]'] = 0 # 使用方式1
         self.driver = webdriver.Remote("http://127.0.0.1:4723/wd/hub", desired_caps)
         self.driver.implicitly_wait(5)
 
     def teardown(self):
+        self.driver.back()
         self.driver.quit()
 
     # @pytest.skip
@@ -79,7 +81,7 @@ class TestWebDriverwait:
         # WebDriverWait(self.driver,10).until(lambda x: x.find_element(MobileBy.XPATH,"//*[contains(@text,'打卡')]"))
         # //*[contains(@text,'下班时间')]/../*[@text='更新打卡']
         #time.sleep(10)
-        self.driver.update_settings({"waitForIdleTimeout":0}) # 缩短加载元素时间，使用方式2
+        self.driver.update_settings({"waitForIdleTimeout":0}) # 解决动态加载过慢的问题，缩短加载元素时间，使用方式2
         aaa = WebDriverWait(self.driver, 10).until(
             lambda x: x.find_element(MobileBy.XPATH, "//*[contains(@text,'更新打卡')]"))
         aaa.click()
@@ -120,10 +122,28 @@ class TestWebDriverwait:
         # 显式等待 断言是否成功
         WebDriverWait(self.driver, 10).until(lambda x: "打卡成功" in x.page_source)
 
-    def test_webwait(self):
+    def test_bounds(self):
         """
-        1.点击工作台，进行搜索成员
+        1.点击工作台，进行搜索成员  实现自动化6.58s  取消元素等待后自动化耗时第一次：4.36s 第二次：3.28s 第三次：3.19s
         2.选择搜索后的其中一个成员
         3.定位第二点contacts
         """
-        pass
+        self.driver.find_element_by_id("com.larksuite.suite:id/app_center_tab").click()
+        # 坐标点定位，绝对坐标值法
+        # action=TouchAction(self.driver)
+        # action.press(x=742,y=116).wait(200).move_to(x=808,y=182).wait(200).release().perform()
+
+        # 相对坐标值法
+        #print(self.driver.find_element().location)
+        #print(self.driver.find_element().size)
+        current_windows=self.driver.get_window_size()
+        windows_x=float(current_windows["width"])
+        #print(windows_x)
+        windows_y=float(current_windows["height"])
+        #print(windows_y/2)
+        action=TouchAction(self.driver)
+        action.press(x=windows_x*0.68,y=windows_y*0.054).wait(200).move_to(x=windows_x*0.74,y=windows_y*0.08).wait(200).release().perform()
+        time.sleep(5)
+        #self.driver.find_element_by_xpath("//*[@text='取消']").click()
+        assert "工作台" in self.driver.page_source
+
